@@ -1,0 +1,44 @@
+CEC 2018 Competition on Many-Objective Optimization
+results by Markus Wagner, markus.wagner@adelaide.edu.au
+-------------------------------------------------------
+
+The algorithm is AGE2 [1,2] and implemented in Java. AGE stands for approximation-guided evolution, and it uses a population to drive the exploration with the goal to achieve a good additive approximation of the true Pareto front. 
+As the true Pareto front is not know a-priori, it makes use of an archive of all non-dominated solutions seen so far, which is an approximation of the true Pareto front by itself. AGE is a (mu+mu)-EMOA that assembles the population for the next generation (based on the union of current population and the offspring) as follows: it iteratively drops those solutions from a set of solutions that (if dropped) have the least impact on the union’s additive approximation of the archive. 
+
+By setting the parameter epsilonGridWidth to values >0, an epsilon-grid approximation of the archive is used, which can reduce the computation time by orders of magnitude without affecting the final solution quality. As I am using post-hoc archive selection (e.g. as used in [3]), I use epsilonGridWidth=0 to deactivate the approximating archive, so that I can select the final population from the archive. For the selection, I re-use AGE’s own internal heuristic to select a good approximation of the archive. Note that, there are algorithms for problems with 2 and 3 objectives in the literature for an optimal subset selection (w.r.t. approximation), but not for this competition’s 5, 10, and 15 objectives. 
+
+The algorithm is implemented in jMetal. The parameters are not tuned: SBX crossover (p=0.9, distribution index 20) and polynomial mutation (p=1/numberOfDecisionVariables, distribution index 20) are used.
+
+Evaluation
+- hypervolume  based on your HV.m, line 15: RefPoint = max(PF,[],1)*1.1;  my Hypervolume.java does in line 459: maximumValues[i] = maximumValues[i]*1.1;
+- IGD: I use the fronts you provided in your jMetal code. 
+
+Files
+- the *.VAR files contain the decision variable values (space-separated)
+- the *.FUN files contain the objective values (space-separated)
+- the *.log files contain lines like the following: 
+MaF08_5D BFNW 100000 mu:240 arc:12866 (HYPpop:0.08457447222778927,HYPpopCEC2018:0.1322195641803444,HYPreal:0.0,EPSpop:0.10599222125853902,SPREADpop:0.5819088376579361,IGDpop:5.526488596721899E-4,GDpop:6.578180067562868E-4) approximation(pop app arc):0.06115486426678762 
+explanation: 
+problem name 
+BFNW (well, this should be AGE2) 
+mu:240 (your limit, these are in the FUN/VAR files) 
+arc: number of non-dominated solutions found (not written to file) 
+HYPpop: hypervolume of the final population based on extreme points of the Pareto front 
+HYPpopCEC2018: hyper volume of the final population based on extreme points (*1.1) of the Pareto front, which is why HYPpopCEC2018>HYPpop [you requested this]
+HYPreal: ignore this
+ EPSpop: epsilon approximation of the given Pareto front of the final population  
+SPREADpop: spread of the given Pareto front of the final population 
+ IGDpop: IGD of the given Pareto front of the final population [you requested this]
+ GDpop: GD of the given Pareto front of the final population  
+approximation(pop app arc): population approximation of the archive (this value is less than EPSpop, since only EPSpop knows of the given Pareto front, which is typically “mode detailed and bigger” than the archive)
+
+[1,2]
+https://www.sciencedirect.com/science/article/abs/pii/S0377221714009552
+https://dl.acm.org/citation.cfm?id=2463448 
+[3]
+https://link.springer.com/chapter/10.1007/978-3-319-51691-2_21
+
+Contact details
+Markus Wagner, markus.wagner@adelaide.edu.au
+https://cs.adelaide.edu.au/~markus/
+University of Adelaide, Australia
